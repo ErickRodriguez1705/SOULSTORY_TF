@@ -1,0 +1,1093 @@
+
+
+
+<!-- Danilo -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SoulStory</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- US01: Inicio de sesión -->
+      <section id="login-screen" class="screen active">
+        <h1>SoulStory</h1>
+        <input type="text" placeholder="Nombres" id="input-nombre" />
+        <input type="email" placeholder="Correo electrónico" />
+        <input type="tel" placeholder="Teléfono" />
+        <input type="text" placeholder="Dirección" />
+        <input type="date" placeholder="Fecha de nacimiento" />
+        <button onclick="goToProfile()">Iniciar Sesión</button>
+      </section>
+
+      <!-- Perfil -->
+      <section id="profile-screen" class="screen hidden">
+        <h2>Mi Perfil</h2>
+        <button onclick="toggleAssistance()">Activación de Asistencias</button>
+        <button onclick="goToMainMenu()">Continuar</button>
+      </section>
+
+      <!-- US01: Menú Principal -->
+      <section id="main-menu" class="screen hidden">
+        <h2>¿Qué buscas hacer hoy?</h2>
+        <button onclick="goTo('audio-screen')">Grabar Audios</button>
+        <button onclick="goTo('write-screen')">Escribir tus memorias</button>
+        <button onclick="goTo('memories-screen')">
+          Ver mis recuerdos guardados
+        </button>
+        <button onclick="goTo('verification-screen')">Ver mi legado</button>
+        <button onclick="goTo('images-screen')">
+          Ver mis imágenes guardadas
+        </button>
+        <button onclick="goTo('video-screen')">Grabar videos</button>
+        <button onclick="goTo('settings-screen')">Configuración</button>
+      </section>
+
+      <!-- US02: Grabar Audios -->
+      <section id="audio-screen" class="screen hidden">
+        <h2>Graba tu recuerdo en un audio</h2>
+        <button onclick="alert('Grabando...')">Presione para grabar</button>
+        <button>Presione para pausar</button>
+        <button onclick="goToMainMenu()">Volver</button>
+      </section>
+
+      <!-- US03: Escribir Memorias -->
+      <section id="write-screen" class="screen hidden">
+        <h2>Escribe tu recuerdo</h2>
+        <textarea
+          id="texto-memoria"
+          placeholder="Empiece a escribir su historia..."
+        ></textarea>
+        <button onclick="guardarEscrito()">Guardar</button>
+        <button onclick="goToMainMenu()">Volver</button>
+      </section>
+
+      <!-- US04, US05, US09, US10: Ver Recuerdos -->
+      <section id="memories-screen" class="screen hidden">
+        <h2>Mis Recuerdos</h2>
+        <select onchange="filtrarRecuerdos(this.value)">
+          <option value="todo">Todo</option>
+          <option value="audio">Audio</option>
+          <option value="video">Video</option>
+          <option value="escrito">Escrito</option>
+        </select>
+        <div id="lista-recuerdos"></div>
+        <button onclick="goToMainMenu()">Volver</button>
+      </section>
+
+      <!-- US06, US07: Galería de imágenes -->
+      <section id="images-screen" class="screen hidden">
+        <h2>Galería de Imágenes</h2>
+        <input type="text" id="desc-imagen" placeholder="¿Qué quieres ver?" />
+        <button onclick="generarImagen()">Generar imagen</button>
+        <div id="imagen-generada"></div>
+        <select onchange="ordenarImagenes(this.value)">
+          <option value="asc">Ascendente</option>
+          <option value="desc">Descendente</option>
+        </select>
+        <div id="galeria-imagenes"></div>
+        <button onclick="goToMainMenu()">Volver</button>
+      </section>
+
+      <!-- US08: Compartir -->
+      <section id="share-screen" class="screen hidden">
+        <h2>Compartir Recuerdo</h2>
+        <input type="email" placeholder="Correo del destinatario" />
+        <select>
+          <option>Solo lectura</option>
+          <option>Lectura y comentario</option>
+        </select>
+        <button onclick="alert('Compartido')">Hecho</button>
+        <button onclick="goTo('memories-screen')">Volver</button>
+      </section>
+
+      <!-- US11: Grabar Video -->
+      <section id="video-screen" class="screen hidden">
+        <h2>Grabar Video</h2>
+        <p>[Simulación de grabación de video]</p>
+        <button onclick="goToMainMenu()">Volver</button>
+      </section>
+    </div>
+    <!-- Mi Legado -->
+    <div id="legacy-screen" class="screen">
+      <h2>Mi Legado</h2>
+      <div id="lista-legado"></div>
+      <button onclick="goToMainMenu()">Volver</button>
+    </div>
+    <!-- Verification Code -->
+    <div id="verification-screen" class="screen">
+      <h2>Verificar Acceso a Mi Legado</h2>
+      <p>Ingresa el código de 6 dígitos enviado a tu correo.</p>
+      <input
+        type="text"
+        id="codigo-verificacion"
+        placeholder="Código de 6 dígitos"
+        maxlength="6"
+      />
+      <button onclick="verificarCodigo()">Verificar</button>
+      <button onclick="enviarCodigo()">Reenviar Código</button>
+      <button onclick="goToMainMenu()">Volver</button>
+    </div>
+    <!-- Reportar Recuerdo -->
+    <div id="report-screen" class="screen">
+      <h2>Reportar Recuerdo</h2>
+      <p>Por favor, ingresa tu correo y el motivo del reporte.</p>
+      <input
+        type="email"
+        id="report-email"
+        placeholder="Tu correo electrónico"
+        required
+      />
+      <input
+        type="text"
+        id="report-subject"
+        placeholder="Asunto del reporte"
+        required
+      />
+      <button onclick="enviarReporte()">Enviar Reporte</button>
+      <button onclick="goToMainMenu()">Cancelar</button>
+    </div>
+    <!-- Descargar Recuerdo -->
+    <div id="download-screen" class="screen">
+      <h2>Descargar Recuerdo</h2>
+      <p>Selecciona el formato para descargar tu recuerdo.</p>
+      <select id="download-format" onchange="mostrarVistaPrevia()">
+        <option value="txt">Texto (.txt)</option>
+        <option value="pdf">PDF (.pdf)</option>
+        <option value="docx">Word (.docx)</option>
+      </select>
+      <div id="preview-area" style="display: none">
+        <h3>Vista Previa</h3>
+        <pre
+          id="preview-content"
+          style="
+            background: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+          "
+        ></pre>
+      </div>
+      <button onclick="descargarRecuerdo()">Confirmar Descarga</button>
+      <button onclick="goToMainMenu()">Cancelar</button>
+    </div>
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SoulStory - Memoria Viva Tech</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <nav class="navbar hidden">
+      <div class="navbar-container">
+        <div class="logo">SoulStory</div>
+
+        <!-- Botón hamburguesa -->
+        <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button>
+      </div>
+
+      <!-- Menú de navegación -->
+      <ul class="menu">
+        <li><a href="#quienes">Quienes Somos</a></li>
+        <li><a href="#proposito">Propósito</a></li>
+        <li><a href="#ayuda">Ayuda</a></li>
+        <li><a href="#contacto">Contáctanos</a></li>
+        <li><a href="#accesibilidad">Perfil</a></li>
+      </ul>
+    </nav>
+
+    <!-- SECCIÓN QUIENES SOMOS -->
+    <section id="quienes" class="seccion hidden">
+      <!-- Contenedor de la imagen -->
+      <div class="seccion-imagen">
+        <!-- Puedes cambiar el nombre y ruta de esta imagen por la tuya -->
+        <img
+          src="IMAGENES/ABUELOS.jpg"
+          alt="Adulto mayor recordando momentos"
+        />
+      </div>
+
+      <!-- Contenedor del texto -->
+      <div class="seccion-texto">
+        <h2>¿Quiénes Somos?</h2>
+        <p>
+          Mémoria Viva Tech es una startup fundada por estudiantes de Ingeniería
+          de Sistemas e Ingeniería de Software de la UPC, dedicada a rescatar y
+          preservar las memorias de los adultos mayores mediante tecnología.
+        </p>
+        <p>
+          Nuestra misión es diseñar herramientas accesibles que, mediante
+          inteligencia artificial, ayuden a documentar y compartir recuerdos
+          significativos, conectando generaciones con un legado emocional
+          duradero.
+        </p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN PROPÓSITO -->
+    <section id="proposito" class="seccion hidden">
+      <!-- Contenedor del texto -->
+      <div class="seccion-texto">
+        <h2>Propósito</h2>
+        <p>
+          Nuestro propósito es preservar las historias de vida de los adultos
+          mayores mediante soluciones tecnológicas que fortalezcan los lazos
+          familiares. Queremos que cada recuerdo se convierta en un legado
+          emotivo y accesible.
+        </p>
+        <p>
+          Promovemos la inclusión digital y celebramos la memoria colectiva para
+          construir una sociedad más empática y consciente de su historia.
+        </p>
+      </div>
+
+      <!-- Contenedor del video (lado derecho) -->
+      <div class="seccion-video">
+        <!-- Inserta aquí el enlace del video de YouTube -->
+        <iframe
+          src="https://www.youtube.com/embed/IzuomgmAy2w"
+          title="Video sobre el propósito"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      </div>
+    </section>
+
+    <!-- SECCIÓN AYUDA -->
+    <section id="ayuda" class="seccion hidden">
+      <h2>Ayuda</h2>
+      <ul>
+        <li>
+          <strong>¿Qué es SoulStory?</strong> Es una app para guardar recuerdos
+          en texto o video, con ilustraciones creadas por inteligencia
+          artificial.
+        </li>
+        <li>
+          <strong>¿Para quién está dirigida?</strong> Principalmente para
+          adultos mayores, aunque cualquier persona puede usarla.
+        </li>
+        <li>
+          <strong>¿Necesito saber de tecnología?</strong> No. Es fácil de usar y
+          pensada para todos.
+        </li>
+        <li>
+          <strong>¿Cómo se crean las ilustraciones?</strong> La app usa IA para
+          generar imágenes según lo que escribas o cuentes.
+        </li>
+        <li>
+          <strong>¿Puedo compartir mis historias?</strong> Sí, mediante enlaces
+          seguros.
+        </li>
+        <li>
+          <strong>¿Es gratis?</strong> Hay una versión gratuita y otras con
+          funciones adicionales.
+        </li>
+        <li>
+          <strong>¿Cómo contacto al soporte?</strong> Escríbenos a
+          soporte@memoriavivatech.com o desde la app.
+        </li>
+      </ul>
+    </section>
+
+    <!-- SECCIÓN CONTÁCTANOS -->
+    <section id="contacto" class="seccion hidden">
+      <h2>Contáctanos</h2>
+      <form class="formulario-contacto">
+        <label for="nombres">Nombres:</label>
+        <input type="text" id="nombres" name="nombres" required />
+
+        <label for="apellidos">Apellidos:</label>
+        <input type="text" id="apellidos" name="apellidos" required />
+
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="asunto">Asunto:</label>
+        <input type="text" id="asunto" name="asunto" required />
+
+        <button type="submit">Enviar</button>
+        <p class="mensaje-aviso">
+          Recuerda usar un correo válido para evitar inconvenientes.
+        </p>
+        <p class="mensaje-enviado" style="display: none">
+          Mensaje enviado correctamente.
+        </p>
+      </form>
+    </section>
+
+    <!-- SECCIÓN CONFIGURACIÓN DE ACCESIBILIDAD -->
+    <section id="accesibilidad" class="seccion hidden">
+      <h2>Configuración de Accesibilidad</h2>
+      <form class="formulario-accesibilidad">
+        <label for="idioma">Idioma:</label>
+        <select id="idioma">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+        </select>
+
+        <label for="tema">Color de Tema:</label>
+        <select id="tema">
+          <option value="claro">Claro</option>
+          <option value="oscuro">Oscuro</option>
+        </select>
+
+        <label for="texto">Tamaño de texto:</label>
+        <input type="number" id="texto" min="12" max="18" value="14" />
+
+        <button type="submit">Guardar</button>
+      </form>
+    </section>
+
+    <script src="main.js"></script>
+  </body>
+</html>
+<!-- SOUL STORY -->
+<!-- US25 -->
+<head>
+  <title>Mi perfil | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <div class="profile-header">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          alt="Perfil"
+          class="icon"
+        />
+        <span id="user-name-display">Mi perfil</span>
+      </div>
+    </header>
+
+    <main>
+      <h1>Mi perfil</h1>
+      <div class="profile-pic">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+          alt="Avatar"
+        />
+        <a href="#" class="change-photo">Cambiar foto</a>
+      </div>
+
+      <form>
+        <label>Nombres</label>
+        <input type="text" id="name" />
+
+        <div class="row">
+          <div>
+            <label>Correo electrónico</label>
+            <input type="email" id="email" />
+          </div>
+          <div>
+            <label>Teléfono</label>
+            <input type="tel" id="phone" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Dirección</label>
+            <input type="text" id="address" />
+          </div>
+          <div>
+            <label>Fecha de nacimiento</label>
+            <input type="date" id="birth" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button type="submit" class="save">Guardar cambios</button>
+          <button type="reset" class="cancel">Cancelar</button>
+        </div>
+      </form>
+
+      <div id="success-message" class="success-message">
+        Cambios guardados con éxito
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Cargar datos al iniciar
+    window.onload = function () {
+      const fields = ["name", "email", "phone", "address", "birth"];
+      fields.forEach((field) => {
+        const saved = localStorage.getItem(field);
+        if (saved) {
+          document.getElementById(field).value = saved;
+        }
+      });
+
+      const nameSaved = localStorage.getItem("name");
+      if (nameSaved) {
+        document.getElementById("user-name-display").innerText = nameSaved;
+      }
+    };
+
+    // Guardar datos al enviar formulario
+    document.querySelector("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
+      const birth = document.getElementById("birth").value;
+
+      localStorage.setItem("name", name);
+      localStorage.setItem("email", email);
+      localStorage.setItem("phone", phone);
+      localStorage.setItem("address", address);
+      localStorage.setItem("birth", birth);
+
+      document.getElementById("user-name-display").innerText = name;
+
+      const msg = document.getElementById("success-message");
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
+
+<!-- US26 -->
+
+<head>
+  <title>Testimonios | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Testimonios</a>
+        <a href="#">Novedades</a>
+        <a href="#">Ayuda</a>
+        <div class="profile">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+            alt="Perfil"
+          />
+          <span>Perfil</span>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Lo que opinan nuestros usuarios</h1>
+
+      <div class="filters">
+        <button class="active">Todos</button>
+        <button>Profesionales</button>
+        <button>Pacientes</button>
+        <button>Familiares</button>
+      </div>
+
+      <div class="testimonials">
+        <div class="card">
+          <div class="user">
+            <img src="https://randomuser.me/api/portraits/women/68.jpg" />
+            <div>
+              <strong>Laura Gutiérrez</strong><br />
+              <span>Profesional</span>
+            </div>
+          </div>
+          <p>
+            La plataforma ha sido invaluable para conectar con mis pacientes y
+            mejorar su cuidado.
+          </p>
+          <div class="actions">
+            <button class="secondary">Compartir</button>
+            <button class="primary">Leer más</button>
+          </div>
+        </div>
+
+        <div class="card pink">
+          <div class="user">
+            <img src="https://randomuser.me/api/portraits/men/45.jpg" />
+            <div>
+              <strong>Ricardo López</strong><br />
+              <span>Paciente</span>
+            </div>
+          </div>
+          <p>
+            Gracias a este servicio, he logrado mejorar mi calidad de vida
+            significativamente.
+          </p>
+          <div class="actions">
+            <button class="tag">Ver recurso</button>
+            <button class="primary">Leer más</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="user">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+            />
+            <div>
+              <strong>Anónimo</strong><br />
+              <span>Familiar</span>
+            </div>
+          </div>
+          <p>
+            Los recursos y el apoyo brindado han sido de gran ayuda para
+            nuestra familia.
+          </p>
+          <div class="actions">
+            <button class="tag">Ver recurso</button>
+          </div>
+        </div>
+
+        <div class="card blue">
+          <div class="user">
+            <img src="https://randomuser.me/api/portraits/men/50.jpg" />
+            <div>
+              <strong>Dr. Mario Pérez</strong><br />
+              <span>Profesional</span>
+            </div>
+          </div>
+          <p>
+            He visto resultados positivos en mis pacientes desde que
+            comenzamos a usar esta herramienta.
+          </p>
+          <div class="actions">
+            <button class="tag">Ver recurso</button>
+            <button class="primary">Leer más</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
+<!-- US27 -->
+
+<head>
+  <title>Política de Privacidad | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Quienes somos</a>
+        <a href="#">Propósito</a>
+        <a href="#">Contáctanos</a>
+        <a href="#">Ayuda</a>
+        <a href="#">Perfil</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Política de privacidad</h1>
+
+      <div class="policy-container">
+        <div class="summary">
+          <h3>Resumen de política:</h3>
+          <ul>
+            <li>Recopilamos solo los datos necesarios</li>
+            <li>Usamos la información para brindarte un mejor servicio</li>
+            <li>No compartimos tus datos sin tu consentimiento</li>
+            <li>
+              Aplicamos medidas de seguridad para proteger tu información
+            </li>
+            <li>
+              Puedes contactarnos para ejercer tus derechos de acceso,
+              rectificación o eliminación
+            </li>
+          </ul>
+        </div>
+
+        <div class="policy-text">
+          <h4>POLÍTICA DE PRIVACIDAD</h4>
+          <p>
+            <strong>1. Introducción</strong><br />
+            Esta política regula el dato de nuestros usuarios, cómo los usamos
+            y cómo los protegemos. Te recomendamos leerla detenidamente para
+            conocer nuestras prácticas.
+          </p>
+
+          <p>
+            <strong>2. Qué información recolectamos</strong><br />
+            Recopilamos tu nombre, correo electrónico, teléfono y otros datos
+            personales cuando los envías a través de nuestros servicios.
+          </p>
+
+          <p>
+            <strong>3. Uso de la información</strong><br />
+            Utilizamos la información para:<br />
+            - Brindarte acceso a nuestros servicios<br />
+            - Enviar notificaciones importantes<br />
+            - Cumplir con requerimientos legales<br />
+            - Con agilizar contratos de información
+          </p>
+
+          <p>
+            <strong>4. Consentimiento</strong><br />
+            No compartiremos tus datos personales con terceros sin tu
+            consentimiento, salvo cuando la ley lo exija o para cumplir con
+            nuestras obligaciones legales.
+          </p>
+
+          <p>
+            <strong>5. Derechos</strong><br />
+            Puedes acceder, corregir o eliminar tu información personal en
+            cualquier momento. Para ello, comunícate con nosotros mediante
+            nuestros canales disponibles.
+          </p>
+
+          <p>
+            <strong>6. Seguridad</strong><br />
+            Aplicamos medidas técnicas y organizativas para proteger tus
+            datos. Aunque ninguna plataforma es 100% segura, trabajamos
+            constantemente para mantener la mejor protección posible.
+          </p>
+
+          <p>
+            <strong>7. Cambios en la política</strong><br />
+            Nos reservamos el derecho de modificar esta política.
+            Notificaremos cualquier cambio importante por los medios
+            habituales.
+          </p>
+        </div>
+      </div>
+
+      <div class="terms-check">
+        <input type="checkbox" id="agree" />
+        <label for="agree">
+          Al hacer clic aquí, declaro que he leído y entendido los
+          <a href="#">términos y condiciones</a>
+        </label>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
+<!-- US28 -->
+<head>
+  <title>Novedades | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Soporte</a>
+        <a href="#">Novedades</a>
+        <a href="#">Ayuda</a>
+        <a href="#">Perfil</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Novedades</h1>
+
+      <div class="news-list">
+        <div class="news-item">
+          <div class="date">12 junio 2025</div>
+          <div class="content">
+            <h3>Se habilitó la nueva sección de eventos</h3>
+            <p>
+              Podrás visualizar actividades pasadas, inscribirte y seguir
+              eventos de tu interés.
+            </p>
+          </div>
+          <a href="detalle.html" class="btn">Leer más</a>
+        </div>
+
+        <div class="news-item">
+          <div class="date">26 mayo 2025</div>
+          <div class="content">
+            <h3>Actualización de la interfaz de usuario</h3>
+            <p>
+              Mejora visual para facilitar tu navegación tanto en web como en
+              móvil.
+            </p>
+          </div>
+          <a href="#" class="btn">Leer más</a>
+        </div>
+
+        <div class="news-item">
+          <div class="date">26 mayo 2025</div>
+          <div class="content">
+            <h3>Integración con herramienta de análisis</h3>
+            <p>
+              Ahora puedes acceder a reportes detallados de tus actividades.
+            </p>
+          </div>
+          <a href="#" class="btn">Leer más</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+<head>
+  <title>Detalle de Novedad | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Soporte</a>
+        <a href="#">Novedades</a>
+        <a href="#">Ayuda</a>
+        <a href="#">Perfil</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Novedades</h1>
+
+      <div class="news-detail">
+        <h3>Se habilitó la nueva sección de eventos</h3>
+        <p class="date">Publicado: 12 junio 2025</p>
+        <p>
+          Ahora los usuarios podrán visualizar las actividades, talleres y
+          eventos organizados por el sistema y sus participantes.
+        </p>
+        <ul>
+          <li>Crear eventos propios</li>
+          <li>Editar fechas y lugares</li>
+          <li>Ver listas de registrados</li>
+          <li>Agregar descripción y archivos</li>
+        </ul>
+        <p>
+          Además, se ha trabajado mejoras de usabilidad, como la integración
+          con tu calendario personal y correos de recordatorio.
+        </p>
+
+        <div class="share">
+          <h4>¿Dónde deseas compartir esta novedad?</h4>
+          <div class="buttons">
+            <button class="facebook">📘 Facebook</button>
+            <button class="twitter">🐦 Twitter</button>
+            <button class="whatsapp">🟢 WhatsApp</button>
+          </div>
+        </div>
+
+        <a href="index.html" class="back">← Volver a Novedades</a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
+<!-- US29 -->
+<head>
+  <title>Selecciona tu idioma | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Quienes somos</a>
+        <a href="#">Propósito</a>
+        <a href="#">Contáctanos</a>
+        <a href="#">Ayuda</a>
+        <a href="#">Perfil</a>
+      </nav>
+    </header>
+
+    <main class="language-selector">
+      <h1>Selecciona tu idioma</h1>
+      <form id="languageForm">
+        <label class="language-option">
+          <input type="radio" name="language" value="Español" checked />
+          <img src="https://flagcdn.com/w40/es.png" alt="Español" />
+          <span>Español</span>
+          <span class="check">✔️</span>
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="Inglés" />
+          <img src="https://flagcdn.com/w40/us.png" alt="Inglés" />
+          <span>Inglés</span>
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="Portugués" />
+          <img src="https://flagcdn.com/w40/br.png" alt="Portugués" />
+          <span>Portugués</span>
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="Francés" />
+          <img src="https://flagcdn.com/w40/fr.png" alt="Francés" />
+          <span>Francés</span>
+        </label>
+
+        <label class="language-option">
+          <input type="radio" name="language" value="Alemán" />
+          <img src="https://flagcdn.com/w40/de.png" alt="Alemán" />
+          <span>Alemán</span>
+        </label>
+
+        <button type="submit">GUARDAR</button>
+        <p id="confirmation" class="hidden">
+          ✅ Idioma cambiado correctamente
+        </p>
+      </form>
+    </main>
+  </div>
+
+
+<!-- US30 -->
+<head>
+  <title>Recursos recomendados | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Recursos</a>
+        <a href="#">Novedades</a>
+        <a href="#">Ayuda</a>
+        <a href="#">Perfil</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Recursos recomendados para ti</h1>
+
+      <div class="filters">
+        <button>Leer más</button>
+        <button>Leer más</button>
+        <button>Leer más</button>
+      </div>
+
+      <div class="resource-grid">
+        <div class="resource-card">
+          <h3>Guía de Evaluación en Educación Inicial</h3>
+          <p class="meta">Categoría: Pedagogía</p>
+          <p class="desc">
+            Una guía completa con estrategias y criterios para evaluar el
+            aprendizaje en educación inicial.
+          </p>
+          <div class="footer">
+            <span class="badge pdf">📄 PDF</span>
+            <button class="view">Ver recurso</button>
+          </div>
+        </div>
+
+        <div class="resource-card">
+          <h3>Introducción a la Teoría del Aprendizaje</h3>
+          <p class="meta">Fecha: 1 marzo 2024</p>
+          <p class="desc">
+            Explora los fundamentos de la teoría del aprendizaje con ejemplos
+            prácticos.
+          </p>
+          <div class="footer">
+            <button class="view">Ver recurso</button>
+            <button class="save">Guardar</button>
+          </div>
+        </div>
+
+        <div class="resource-card">
+          <h3>Métodos de Enseñanza Activos</h3>
+          <p class="meta">Fecha: 15 febrero 2024</p>
+          <p class="desc">
+            Descubre enfoques basados en aplicaciones de metodologías activas.
+          </p>
+          <div class="footer">
+            <span class="badge article">📘 Artículo</span>
+            <button class="view">Ver recurso</button>
+          </div>
+        </div>
+
+        <div class="resource-card">
+          <h3>Curso sobre Herramientas Digitales</h3>
+          <p class="meta">Categoría: Educación Digital</p>
+          <p class="desc">
+            Descubre cómo integrar herramientas digitales a tus prácticas
+            educativas.
+          </p>
+          <div class="footer">
+            <span class="badge course">🎓 Curso</span>
+            <button class="view">Ver recurso</button>
+            <button class="save">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
+
+<!-- US31 -->
+<head>
+  <title>Historial de Mantenimiento | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Recursos</a>
+        <a href="#">Novedades</a>
+        <a href="#">Ayuda</a>
+        <a href="#">Servicio Técnico</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Historial de Mantenimiento</h1>
+      <p class="subtitle">
+        Consulta las interrupciones registradas en el sistema
+      </p>
+
+      <div class="content">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="tablaMantenimientos">
+            <tr onclick="mostrarDetalle(0)">
+              <td>05/06/2025</td>
+              <td>Finalizado</td>
+              <td>Actualización del servidor de datos</td>
+            </tr>
+            <tr onclick="mostrarDetalle(1)">
+              <td>26/05/2025</td>
+              <td>Finalizado</td>
+              <td>Mantenimiento por seguridad</td>
+            </tr>
+            <tr onclick="mostrarDetalle(2)">
+              <td>12/05/2025</td>
+              <td>Finalizado</td>
+              <td>Optimización de rendimiento</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="detalle" id="detalle">
+          <h3>Detalle del Mantenimiento</h3>
+          <p><strong>Fecha:</strong> <span id="fecha"></span></p>
+          <p><strong>Duración:</strong> <span id="duracion"></span></p>
+          <p><strong>Causa:</strong> <span id="causa"></span></p>
+          <p>
+            <strong>Componentes afectados:</strong>
+            <span id="componentes"></span>
+          </p>
+          <button onclick="descargarPDF()">Descargar PDF</button>
+          <div id="mensajeDescarga" class="hidden">
+            ✅ El archivo se ha descargado correctamente.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+
+
+<!-- US32 -->
+<head>
+  <title>Glosario | SoulStory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">SoulStory</div>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Recursos</a>
+        <a href="#">Soporte</a>
+        <a href="#">Información</a>
+        <div class="avatar">👤</div>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Glosario de términos institucionales</h1>
+      <p class="subtitle">
+        Consulta las definiciones y ejemplos de uso de términos técnicos que
+        encontrarás en la plataforma.
+      </p>
+
+      <div class="search-box">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="🔍 Escribe un término para buscar..."
+        />
+      </div>
+
+      <section class="termino" id="term-validation">
+        <h2>A</h2>
+        <h3>Validación cruzada</h3>
+        <p class="descripcion">
+          Técnica estadística usada para evaluar la eficacia de modelos
+          predictivos dividiendo los datos en subconjuntos.
+        </p>
+        <button onclick="toggleEjemplo(true)" class="ver-btn">
+          Ver ejemplo de uso
+        </button>
+        <button
+          onclick="alert('Más ejemplos de uso próximamente')"
+          class="extra-btn"
+        >
+          Ver más ejemplos de uso
+        </button>
+
+        <div id="ejemploUso" class="ejemplo hidden">
+          <strong>Ejemplo:</strong>
+          <p>
+            Antes de publicar los resultados, aplicamos validación cruzada
+            sobre los datos para asegurarnos de la precisión del modelo.
+          </p>
+          <button onclick="toggleEjemplo(false)">Cerrar</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
